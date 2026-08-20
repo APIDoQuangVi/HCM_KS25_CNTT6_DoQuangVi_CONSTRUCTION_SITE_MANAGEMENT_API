@@ -9,6 +9,8 @@ class SiteMemberCreate(BaseModel):
     user_id: int
     role: SiteMemberRole = SiteMemberRole.MEMBER
 
+class SiteMemberUpdate(BaseModel):
+    role: SiteMemberRole
 
 class SiteMemberResponse(BaseModel):
     site_id: int
