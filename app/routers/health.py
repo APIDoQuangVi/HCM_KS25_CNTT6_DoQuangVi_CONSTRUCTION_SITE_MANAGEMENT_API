@@ -12,7 +12,7 @@ def health_check():
         "message": "API is healthy",
         "data": {
             "status": "ok",
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.utcnow(),
         },
         "error": None,
     }
