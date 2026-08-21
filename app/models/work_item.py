@@ -1,8 +1,16 @@
 from datetime import datetime
 from enum import Enum
 
-from sqlalchemy import DateTime, Enum as SQLEnum, ForeignKey, Integer, String, Text
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy import (
+    Column,
+    DateTime,
+    Enum as SQLEnum,
+    ForeignKey,
+    Integer,
+    String,
+    Text,
+)
+from sqlalchemy.orm import relationship
 
 from app.db.database import Base
 
@@ -22,33 +30,64 @@ class WorkItemPriority(str, Enum):
 class WorkItem(Base):
     __tablename__ = "work_items"
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
-    site_id: Mapped[int] = mapped_column(
+    id = Column(
+        Integer,
+        primary_key=True,
+        index=True,
+    )
+
+    site_id = Column(
+        Integer,
         ForeignKey("construction_sites.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
-    title: Mapped[str] = mapped_column(String(255), nullable=False)
-    description: Mapped[str | None] = mapped_column(Text, nullable=True)
-    assignee_id: Mapped[int | None] = mapped_column(
+
+    title = Column(
+        String(255),
+        nullable=False,
+    )
+
+    description = Column(
+        Text,
+        nullable=True,
+    )
+
+    assignee_id = Column(
+        Integer,
         ForeignKey("users.id", ondelete="SET NULL"),
         nullable=True,
         index=True,
     )
-    status: Mapped[WorkItemStatus] = mapped_column(
+
+    status = Column(
         SQLEnum(WorkItemStatus),
         nullable=False,
         default=WorkItemStatus.TODO,
     )
-    priority: Mapped[WorkItemPriority] = mapped_column(
+
+    priority = Column(
         SQLEnum(WorkItemPriority),
         nullable=False,
         default=WorkItemPriority.MEDIUM,
     )
-    due_date: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=datetime.utcnow)
 
-    site = relationship("ConstructionSite", back_populates="work_items")
+    due_date = Column(
+        DateTime,
+        nullable=True,
+    )
+
+    created_at = Column(
+        DateTime,
+        nullable=False,
+        default=datetime.utcnow,
+    )
+
+    site = relationship(
+        "ConstructionSite",
+        back_populates="work_items",
+    )
+
     assignee = relationship(
         "User",
         back_populates="assigned_work_items",
