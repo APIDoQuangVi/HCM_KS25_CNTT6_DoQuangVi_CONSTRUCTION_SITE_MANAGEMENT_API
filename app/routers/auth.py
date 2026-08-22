@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
+
 from sqlalchemy.orm import Session
 
 from app.db.database import get_db
@@ -36,32 +37,24 @@ def register(
     db: Session = Depends(get_db)
 ):
 
-    # =========================
-    # 1. Kiểm tra email
-    # =========================
-
+    # Tìm email trong database
     old_user = db.query(User).filter(
         User.email == data.email
     ).first()
 
+    # Email đã tồn tại
     if old_user:
         raise HTTPException(
             status_code=400,
             detail="Email đã tồn tại"
         )
 
-    # =========================
-    # 2. Hash password
-    # =========================
-
+    # Hash password
     password_hash = hash_password(
         data.password
     )
 
-    # =========================
-    # 3. Tạo user
-    # =========================
-
+    # Tạo user
     user = User(
         email=data.email,
         password_hash=password_hash,
@@ -70,10 +63,7 @@ def register(
         is_active=True
     )
 
-    # =========================
-    # 4. Lưu database
-    # =========================
-
+    # Lưu database
     db.add(user)
 
     db.commit()
@@ -92,24 +82,19 @@ def login(
     db: Session = Depends(get_db)
 ):
 
-    # =========================
-    # 1. Tìm user
-    # =========================
-
+    # Tìm user
     user = db.query(User).filter(
         User.email == data.email
     ).first()
 
+    # Không tìm thấy user
     if user is None:
         raise HTTPException(
             status_code=401,
             detail="Email hoặc password không đúng"
         )
 
-    # =========================
-    # 2. Kiểm tra password
-    # =========================
-
+    # Kiểm tra password
     password_correct = verify_password(
         data.password,
         user.password_hash
@@ -121,20 +106,14 @@ def login(
             detail="Email hoặc password không đúng"
         )
 
-    # =========================
-    # 3. Kiểm tra tài khoản
-    # =========================
-
+    # Kiểm tra tài khoản
     if user.is_active is False:
         raise HTTPException(
             status_code=403,
             detail="Tài khoản đã bị khóa"
         )
 
-    # =========================
-    # 4. Tạo JWT
-    # =========================
-
+    # Tạo JWT
     token_data = {
         "sub": str(user.id)
     }
@@ -142,10 +121,6 @@ def login(
     access_token = create_access_token(
         token_data
     )
-
-    # =========================
-    # 5. Trả token
-    # =========================
 
     return {
         "access_token": access_token,

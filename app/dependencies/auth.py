@@ -1,13 +1,12 @@
 from fastapi import Depends, HTTPException
 from fastapi.security import HTTPBearer
+
 from sqlalchemy.orm import Session
 
 from app.db.database import get_db
-from app.models.user import User
+from app.models.user import User, UserRole
 
 from app.core.security import decode_access_token
-
-from app.models.user import User, UserRole
 
 
 security = HTTPBearer()
@@ -21,20 +20,19 @@ def get_current_user(
     Lấy user hiện tại từ JWT.
     """
 
-    # Lấy token từ Authorization
+    # Lấy token
     access_token = token.credentials
 
     # Giải mã token
     payload = decode_access_token(access_token)
 
-    # Token sai hoặc hết hạn
     if not payload:
         raise HTTPException(
             status_code=401,
             detail="Token không hợp lệ hoặc đã hết hạn"
         )
 
-    # Lấy user id từ JWT
+    # Lấy user id
     user_id = payload.get("sub")
 
     if user_id is None:
@@ -68,7 +66,7 @@ def get_current_admin(
     current_user: User = Depends(get_current_user)
 ):
     """
-    Chỉ cho phép ADMIN sử dụng.
+    Kiểm tra user có phải Admin không.
     """
 
     if current_user.role != UserRole.ADMIN:

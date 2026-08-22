@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends
+
 from sqlalchemy.orm import Session
 
 from app.db.database import get_db
@@ -19,10 +20,6 @@ router = APIRouter(
 )
 
 
-# =====================================
-# GET CURRENT USER
-# =====================================
-
 @router.get(
     "/me",
     response_model=UserResponse
@@ -35,10 +32,6 @@ def get_my_profile(
 
     return current_user
 
-
-# =====================================
-# GET ALL USERS
-# =====================================
 
 @router.get(
     "",
@@ -57,10 +50,7 @@ def get_all_users(
 
     query = db.query(User)
 
-    # =========================
-    # Search
-    # =========================
-
+    # Search tên hoặc email
     if search:
 
         query = query.filter(
@@ -73,19 +63,12 @@ def get_all_users(
             ))
         )
 
-    # =========================
-    # Filter active
-    # =========================
-
+    # Filter trạng thái
     if is_active is not None:
 
         query = query.filter(
             User.is_active == is_active
         )
-
-    # =========================
-    # Lấy danh sách
-    # =========================
 
     users = query.all()
 
