@@ -5,6 +5,10 @@ pymysql
 pydantic
 pydantic-settings
 python-dotenv
-pyjwt
+
+python-jose
+passlib
 bcrypt
+
+email-validator
 python-multipart

@@ -1,12 +1,12 @@
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
-from fastapi.middleware.cors import CORSMiddleware
-
 from app.core.config import settings
 from app.db.database import Base, engine
 from app.models import user, site, site_member, work_item
 from app.routers.health import router as health_router
+from app.routers.auth import router as auth_router
+from app.routers.users import router as users_router
 
 Base.metadata.create_all(bind=engine)
 
@@ -15,7 +15,7 @@ app = FastAPI(
 )
 
 @app.exception_handler(RequestValidationError)
-async def validation_exception_handler(
+def validation_exception_handler(
     request: Request,
     exc: RequestValidationError,
 ):
@@ -32,7 +32,7 @@ async def validation_exception_handler(
 
 
 @app.exception_handler(404)
-async def not_found_exception_handler(request: Request, exc):
+def not_found_exception_handler(request: Request, exc):
     return JSONResponse(
         status_code=404,
         content={
@@ -46,7 +46,7 @@ async def not_found_exception_handler(request: Request, exc):
 
 
 @app.exception_handler(400)
-async def bad_request_exception_handler(request: Request, exc):
+def bad_request_exception_handler(request: Request, exc):
     return JSONResponse(
         status_code=400,
         content={
@@ -60,7 +60,7 @@ async def bad_request_exception_handler(request: Request, exc):
 
 
 @app.exception_handler(403)
-async def forbidden_exception_handler(request: Request, exc):
+def forbidden_exception_handler(request: Request, exc):
     return JSONResponse(
         status_code=403,
         content={
@@ -74,3 +74,5 @@ async def forbidden_exception_handler(request: Request, exc):
 
 
 app.include_router(health_router)
+app.include_router(auth_router)
+app.include_router(users_router)
