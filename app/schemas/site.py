@@ -1,11 +1,12 @@
 from datetime import datetime
+from typing import Optional
 
 from pydantic import BaseModel, ConfigDict
 
 
 class ConstructionSiteBase(BaseModel):
     name: str
-    description: str | None = None
+    description: Optional[str] = None
 
 
 class ConstructionSiteCreate(ConstructionSiteBase):
@@ -13,8 +14,8 @@ class ConstructionSiteCreate(ConstructionSiteBase):
 
 
 class ConstructionSiteUpdate(BaseModel):
-    name: str | None = None
-    description: str | None = None
+    name: Optional[str] = None
+    description: Optional[str] = None
 
 
 class ConstructionSiteResponse(ConstructionSiteBase):
