@@ -1,5 +1,5 @@
 from datetime import datetime
-from enum import Enum
+
 
 from sqlalchemy import (
     Column,
@@ -14,11 +14,6 @@ from sqlalchemy import (
 from sqlalchemy.orm import relationship
 
 from app.db.database import Base
-
-
-class SiteMemberRole(str, Enum):
-    OWNER = "OWNER"
-    MEMBER = "MEMBER"
 
 
 class ConstructionSite(Base):

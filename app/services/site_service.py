@@ -43,8 +43,12 @@ def get_my_sites(
 ):
     return (
         db.query(ConstructionSite)
+        .join(
+            SiteMember,
+            SiteMember.site_id == ConstructionSite.id,
+        )
         .filter(
-            ConstructionSite.owner_id == current_user.id
+            SiteMember.user_id == current_user.id
         )
         .all()
     )

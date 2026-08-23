@@ -10,6 +10,9 @@ from app.routers.users import router as users_router
 from app.routers import site
 from app.routers import site_member
 from app.routers import work_item
+
+
+
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
@@ -80,4 +83,4 @@ app.include_router(auth_router)
 app.include_router(users_router)
 app.include_router(site.router)
 app.include_router(site_member.router)
-from app.routers import work_item
+app.include_router(work_item.router)

@@ -40,12 +40,6 @@ def create_work_item(
     item_data: WorkItemCreate,
     current_user: User,
 ):
-    check_member(
-        db,
-        site_id,
-        current_user.id,
-    )
-
     site = (
         db.query(ConstructionSite)
         .filter(ConstructionSite.id == site_id)
@@ -57,6 +51,12 @@ def create_work_item(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Công trình không tồn tại",
         )
+
+    check_member(
+        db,
+        site_id,
+        current_user.id,
+    )
 
     if item_data.assignee_id is not None:
         assignee = (
@@ -96,6 +96,18 @@ def get_work_items(
     site_id: int,
     current_user: User,
 ):
+    site = (
+        db.query(ConstructionSite)
+        .filter(ConstructionSite.id == site_id)
+        .first()
+    )
+
+    if not site:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Công trình không tồn tại",
+        )
+
     check_member(
         db,
         site_id,
