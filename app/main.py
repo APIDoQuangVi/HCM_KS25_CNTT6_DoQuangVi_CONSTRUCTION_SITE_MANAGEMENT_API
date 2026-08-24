@@ -1,9 +1,13 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, HTTPException
 from fastapi.exceptions import RequestValidationError
+from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
+
 from app.core.config import settings
 from app.db.database import Base, engine
+
 from app.models import user, site, site_member, work_item
+
 from app.routers.health import router as health_router
 from app.routers.auth import router as auth_router
 from app.routers.users import router as users_router
@@ -12,70 +16,49 @@ from app.routers import site_member
 from app.routers import work_item
 
 
-
 Base.metadata.create_all(bind=engine)
+
 
 app = FastAPI(
     title=settings.APP_NAME
 )
 
+
 @app.exception_handler(RequestValidationError)
-def validation_exception_handler(
+async def validation_exception_handler(
     request: Request,
-    exc: RequestValidationError,
+    exc: RequestValidationError
 ):
     return JSONResponse(
         status_code=422,
         content={
             "statusCode": 422,
-            "message": "Validation error",
+            "message": "Dữ liệu đầu vào không hợp lệ",
             "data": None,
-            "error": exc.errors(),
+            "error": jsonable_encoder(exc.errors()),
             "path": str(request.url.path),
         },
     )
 
 
-@app.exception_handler(404)
-def not_found_exception_handler(request: Request, exc):
+
+@app.exception_handler(HTTPException)
+async def http_exception_handler(
+    request: Request,
+    exc: HTTPException
+):
     return JSONResponse(
-        status_code=404,
+        status_code=exc.status_code,
+        headers=exc.headers,
         content={
-            "statusCode": 404,
-            "message": "Resource not found",
+            "statusCode": exc.status_code,
+            "message": str(exc.detail),
             "data": None,
-            "error": str(exc),
+            "error": str(exc.detail),
             "path": str(request.url.path),
         },
     )
 
-
-@app.exception_handler(400)
-def bad_request_exception_handler(request: Request, exc):
-    return JSONResponse(
-        status_code=400,
-        content={
-            "statusCode": 400,
-            "message": "Bad request",
-            "data": None,
-            "error": str(exc),
-            "path": str(request.url.path),
-        },
-    )
-
-
-@app.exception_handler(403)
-def forbidden_exception_handler(request: Request, exc):
-    return JSONResponse(
-        status_code=403,
-        content={
-            "statusCode": 403,
-            "message": "Forbidden",
-            "data": None,
-            "error": str(exc),
-            "path": str(request.url.path),
-        },
-    )
 
 
 app.include_router(health_router)

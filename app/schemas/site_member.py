@@ -1,16 +1,18 @@
 from datetime import datetime
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 from app.models.site_member import SiteMemberRole
 
 
 class SiteMemberCreate(BaseModel):
-    user_id: int
+    user_id: int = Field(..., gt=0)
     role: SiteMemberRole = SiteMemberRole.MEMBER
+
 
 class SiteMemberUpdate(BaseModel):
     role: SiteMemberRole
+
 
 class SiteMemberResponse(BaseModel):
     site_id: int
@@ -18,4 +20,6 @@ class SiteMemberResponse(BaseModel):
     role: SiteMemberRole
     joined_at: datetime
 
-    model_config = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(
+        from_attributes=True
+    )
