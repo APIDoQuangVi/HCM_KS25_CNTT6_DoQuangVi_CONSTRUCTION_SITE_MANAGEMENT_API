@@ -1,11 +1,10 @@
-from fastapi import FastAPI, Request, HTTPException
+from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
-from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
+from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from app.core.config import settings
 from app.db.database import Base, engine
-
 from app.models import user, site, site_member, work_item
 
 from app.routers.health import router as health_router
@@ -16,6 +15,7 @@ from app.routers import site_member
 from app.routers import work_item
 
 
+# Import model trước khi create_all
 Base.metadata.create_all(bind=engine)
 
 
@@ -27,38 +27,47 @@ app = FastAPI(
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(
     request: Request,
-    exc: RequestValidationError
+    exc: RequestValidationError,
 ):
     return JSONResponse(
         status_code=422,
         content={
             "statusCode": 422,
-            "message": "Dữ liệu đầu vào không hợp lệ",
+            "message": "Validation error",
             "data": None,
-            "error": jsonable_encoder(exc.errors()),
+            "error": exc.errors(),
             "path": str(request.url.path),
         },
     )
 
 
-
-@app.exception_handler(HTTPException)
+@app.exception_handler(StarletteHTTPException)
 async def http_exception_handler(
     request: Request,
-    exc: HTTPException
+    exc: StarletteHTTPException,
 ):
+    status_messages = {
+        400: "Bad request",
+        401: "Unauthorized",
+        403: "Forbidden",
+        404: "Resource not found",
+    }
+
+    message = status_messages.get(
+        exc.status_code,
+        "HTTP error",
+    )
+
     return JSONResponse(
         status_code=exc.status_code,
-        headers=exc.headers,
         content={
             "statusCode": exc.status_code,
-            "message": str(exc.detail),
+            "message": message,
             "data": None,
-            "error": str(exc.detail),
+            "error": exc.detail,
             "path": str(request.url.path),
         },
     )
-
 
 
 app.include_router(health_router)
