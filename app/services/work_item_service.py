@@ -4,12 +4,17 @@ from sqlalchemy.orm import Session
 from app.models.site import ConstructionSite
 from app.models.site_member import SiteMember
 from app.models.user import User
-from app.models.work_item import WorkItem
+from app.models.work_item import (
+    WorkItem,
+    WorkItemPriority,
+    WorkItemStatus,
+)
 from app.schemas.work_item import (
     WorkItemCreate,
     WorkItemUpdate,
 )
 
+from typing import Optional
 
 def check_member(
     db: Session,
@@ -95,6 +100,9 @@ def get_work_items(
     db: Session,
     site_id: int,
     current_user: User,
+    search: Optional[str] = None,
+    item_status: Optional[WorkItemStatus] = None,
+    priority: Optional[WorkItemPriority] = None,
 ):
     site = (
         db.query(ConstructionSite)
@@ -114,11 +122,30 @@ def get_work_items(
         current_user.id,
     )
 
-    return (
+    query = (
         db.query(WorkItem)
         .filter(WorkItem.site_id == site_id)
-        .all()
     )
+
+    if search:
+        search = search.strip()
+
+    if search:
+        query = query.filter(
+            WorkItem.title.ilike(f"%{search}%")
+        )
+
+    if item_status is not None:
+        query = query.filter(
+            WorkItem.status == item_status
+        )
+
+    if priority is not None:
+        query = query.filter(
+            WorkItem.priority == priority
+        )
+
+    return query.all()
 
 
 def get_work_item(

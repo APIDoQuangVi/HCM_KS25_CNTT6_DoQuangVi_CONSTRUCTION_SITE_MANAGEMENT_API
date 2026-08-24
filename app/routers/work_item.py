@@ -1,9 +1,15 @@
+from typing import Optional
+
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 
 from app.db.database import get_db
 from app.dependencies.auth import get_current_user
 from app.models.user import User
+from app.models.work_item import (
+    WorkItemPriority,
+    WorkItemStatus,
+)
 from app.schemas.work_item import (
     WorkItemCreate,
     WorkItemResponse,
@@ -42,6 +48,9 @@ def create_work_item(
 )
 def get_work_items(
     site_id: int,
+    search: Optional[str] = None,
+    status: Optional[WorkItemStatus] = None,
+    priority: Optional[WorkItemPriority] = None,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
@@ -49,6 +58,9 @@ def get_work_items(
         db,
         site_id,
         current_user,
+        search,
+        status,
+        priority,
     )
 
 

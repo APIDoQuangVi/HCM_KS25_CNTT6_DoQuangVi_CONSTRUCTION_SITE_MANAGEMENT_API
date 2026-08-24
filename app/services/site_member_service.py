@@ -160,6 +160,11 @@ def remove_member(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Thành viên không tồn tại trong công trình",
         )
-
+    if member.role == SiteMemberRole.OWNER :
+        raise HTTPException (
+            status_code= status.HTTP_400_BAD_REQUEST,
+            detail="không thể xóa owner của công trình"
+        )
+        
     db.delete(member)
     db.commit()
