@@ -9,6 +9,8 @@ from app.schemas.site import (
     ConstructionSiteUpdate,
 )
 
+from typing import Optional
+
 
 def create_site(
     db: Session,
@@ -40,8 +42,9 @@ def create_site(
 def get_my_sites(
     db: Session,
     current_user: User,
+    search: Optional[str] = None,
 ):
-    return (
+    query = (
         db.query(ConstructionSite)
         .join(
             SiteMember,
@@ -50,8 +53,17 @@ def get_my_sites(
         .filter(
             SiteMember.user_id == current_user.id
         )
-        .all()
     )
+
+    if search:
+        search = search.strip()
+
+        if search:
+            query = query.filter(
+                ConstructionSite.name.ilike(f"%{search}%")
+            )
+
+    return query.all()
 
 
 def get_site_by_id(

@@ -11,6 +11,8 @@ from app.schemas.site import (
 )
 from app.services import site_service
 
+from typing import Optional
+
 
 router = APIRouter(
     prefix="/construction-sites",
@@ -40,6 +42,7 @@ def create_construction_site(
     response_model=list[ConstructionSiteResponse],
 )
 def get_my_construction_sites(
+    search: Optional[str] = None,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
