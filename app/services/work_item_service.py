@@ -103,6 +103,11 @@ def get_work_items(
     search: Optional[str] = None,
     item_status: Optional[WorkItemStatus] = None,
     priority: Optional[WorkItemPriority] = None,
+    assignee_id: Optional[int] = None,
+    limit: int = 20,
+    offset: int = 0,
+    sort_by: str = "created_at",
+    sort_order: str = "desc",
 ):
     site = (
         db.query(ConstructionSite)
@@ -144,8 +149,27 @@ def get_work_items(
         query = query.filter(
             WorkItem.priority == priority
         )
+    if assignee_id is not None:
+        query = query.filter(
+            WorkItem.assignee_id == assignee_id
+        )
+    sort_column = {
+        "created_at": WorkItem.created_at,
+        "due_date": WorkItem.due_date,
+    }[sort_by]
 
-    return query.all()
+    if sort_order == "asc":
+        query = query.order_by(sort_column.asc())
+    else:
+        query = query.order_by(sort_column.desc())
+
+    return (
+    query
+    
+    .offset(offset)
+    .limit(limit)
+    .all()
+)
 
 
 def get_work_item(
@@ -204,6 +228,11 @@ def update_work_item(
     update_data = item_data.model_dump(
         exclude_unset=True
     )
+    if not update_data:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Không có dữ liệu để cập nhật",
+            )
 
     if "assignee_id" in update_data:
         if update_data["assignee_id"] is not None:

@@ -1,6 +1,6 @@
 from typing import Optional
 
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.orm import Session
 
 from app.db.database import get_db
@@ -51,6 +51,24 @@ def get_work_items(
     search: Optional[str] = None,
     status: Optional[WorkItemStatus] = None,
     priority: Optional[WorkItemPriority] = None,
+    assignee_id: Optional[int] = None,
+    limit: int = Query(
+        default=20,
+        ge=1,
+        le=100,
+    ),
+    offset: int = Query(
+        default=0,
+        ge=0,
+    ),
+    sort_by: str = Query(
+        default="created_at",
+        pattern="^(created_at|due_date)$",
+    ),
+    sort_order: str = Query(
+        default="desc",
+        pattern="^(asc|desc)$",
+    ),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
@@ -61,6 +79,11 @@ def get_work_items(
         search,
         status,
         priority,
+        assignee_id,
+        limit=limit,
+        offset=offset,
+        sort_by=sort_by,
+        sort_order=sort_order,
     )
 
 
