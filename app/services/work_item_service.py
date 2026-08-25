@@ -210,19 +210,28 @@ def update_work_item(
         current_user,
     )
 
-    member = check_member(
-        db,
-        item.site_id,
-        current_user.id,
+    member = (
+    db.query(SiteMember)
+    .filter(
+        SiteMember.site_id == item.site_id,
+        SiteMember.user_id == current_user.id,
     )
+    .first()
+)
 
-    if (
-        member.role != "OWNER"
-        and item.assignee_id != current_user.id
-    ):
+    if not member:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Bạn không có permission cập nhật hạng mục này",
+            detail="Bạn không phải thành viên của công trình",
+        )
+
+    is_owner = member.role == "OWNER"
+    is_assignee = item.assignee_id == current_user.id
+
+    if not is_owner and not is_assignee:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Bạn không có quyền cập nhật hạng mục này",
         )
 
     update_data = item_data.model_dump(
@@ -248,9 +257,9 @@ def update_work_item(
 
             if not assignee:
                 raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="Assignee phải là thành viên của công trình",
-                )
+                    status_code=status.HTTP_403_FORBIDDEN,
+                    detail="Không thể giao việc cho người ngoài công trình",
+                    )
 
     for key, value in update_data.items():
         setattr(item, key, value)
@@ -272,19 +281,28 @@ def delete_work_item(
         current_user,
     )
 
-    member = check_member(
-        db,
-        item.site_id,
-        current_user.id,
+    member = (
+    db.query(SiteMember)
+    .filter(
+        SiteMember.site_id == item.site_id,
+        SiteMember.user_id == current_user.id,
     )
+    .first()
+)
 
-    if (
-        member.role != "OWNER"
-        and item.assignee_id != current_user.id
-    ):
+    if not member:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Bạn không có permission xóa hạng mục này",
+            detail="Bạn không phải thành viên của công trình",
+        )
+
+    is_owner = member.role == "OWNER"
+    is_assignee = item.assignee_id == current_user.id
+
+    if not is_owner and not is_assignee:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Bạn không có quyền xóa hạng mục này",
         )
 
     db.delete(item)
