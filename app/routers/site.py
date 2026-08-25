@@ -49,6 +49,7 @@ def get_my_construction_sites(
     return site_service.get_my_sites(
         db,
         current_user,
+        search,
     )
 
 
