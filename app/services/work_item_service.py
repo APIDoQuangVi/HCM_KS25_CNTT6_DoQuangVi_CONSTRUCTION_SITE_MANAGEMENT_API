@@ -62,8 +62,9 @@ def create_work_item(
         site_id,
         current_user.id,
     )
-
-    if item_data.assignee_id is not None:
+    if item_data.assignee_id == 0 :
+        item_data.assignee_id = current_user.id 
+    elif item_data.assignee_id is not None:
         assignee = (
             db.query(SiteMember)
             .filter(
