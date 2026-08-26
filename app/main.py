@@ -13,6 +13,10 @@ from app.routers.users import router as users_router
 from app.routers import site
 from app.routers import site_member
 from app.routers import work_item
+from app.core.exceptions import (
+    validation_exception_handler,
+    http_exception_handler,
+)
 
 
 # Import model trước khi create_all
@@ -23,51 +27,14 @@ app = FastAPI(
     title=settings.APP_NAME
 )
 
-
-@app.exception_handler(RequestValidationError)
-async def validation_exception_handler(
-    request: Request,
-    exc: RequestValidationError,
-):
-    return JSONResponse(
-        status_code=422,
-        content={
-            "statusCode": 422,
-            "message": "Validation error",
-            "data": None,
-            "error": exc.errors(),
-            "path": str(request.url.path),
-        },
-    )
-
-
-@app.exception_handler(StarletteHTTPException)
-async def http_exception_handler(
-    request: Request,
-    exc: StarletteHTTPException,
-):
-    status_messages = {
-        400: "Bad request",
-        401: "Unauthorized",
-        403: "Forbidden",
-        404: "Resource not found",
-    }
-
-    message = status_messages.get(
-        exc.status_code,
-        "HTTP error",
-    )
-
-    return JSONResponse(
-        status_code=exc.status_code,
-        content={
-            "statusCode": exc.status_code,
-            "message": message,
-            "data": None,
-            "error": exc.detail,
-            "path": str(request.url.path),
-        },
-    )
+app.add_exception_handler(
+    RequestValidationError,
+    validation_exception_handler,
+)
+app.add_exception_handler(
+    StarletteHTTPException,
+    http_exception_handler,
+)
 
 
 app.include_router(health_router)

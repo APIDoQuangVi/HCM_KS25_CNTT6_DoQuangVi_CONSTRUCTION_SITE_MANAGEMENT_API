@@ -1,13 +1,37 @@
-from fastapi import HTTPException, status
+
+from fastapi import Request
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
+from starlette.exceptions import HTTPException as StarletteHTTPException
 
 
-def not_found(message: str = "Resource not found"):
-    return HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=message)
 
 
-def bad_request(message: str = "Bad request"):
-    return HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=message)
+def validation_exception_handler(
+    request: Request,
+    exc: RequestValidationError,
+):
+    return JSONResponse(
+        status_code=422,
+        content={
+            "statusCode": 422,
+            "message": "Validation error",
+            "data": None,
+            "error": exc.errors(),
+        },
+    )
 
 
-def forbidden(message: str = "Forbidden"):
-    return HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=message)
+def http_exception_handler(
+    request: Request,
+    exc: StarletteHTTPException,
+):
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={
+            "statusCode": exc.status_code,
+            "message": str(exc.detail),
+            "data": None,
+            "error": None,
+        },
+    )
