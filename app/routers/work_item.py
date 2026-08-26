@@ -12,6 +12,7 @@ from app.models.work_item import (
 )
 from app.schemas.work_item import (
     WorkItemCreate,
+    WorkItemPaginatedResponse,
     WorkItemResponse,
     WorkItemUpdate,
 )
@@ -48,7 +49,7 @@ def create_work_item(
     "/construction-sites/{site_id}/work-items",
     summary="Danh sách hạng mục thi công",
     description="Lấy danh sách hạng mục với bộ lọc, phân trang và sắp xếp.",
-    response_model=list[WorkItemResponse],
+    response_model=WorkItemPaginatedResponse,
     status_code=status.HTTP_200_OK,
 )
 def get_work_items(

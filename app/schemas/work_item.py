@@ -129,3 +129,11 @@ class WorkItemResponse(WorkItemBase):
     model_config = ConfigDict(
         from_attributes=True
     )
+
+
+class WorkItemPaginatedResponse(BaseModel):
+    items: list[WorkItemResponse]
+    totalpage: int
+    page: int
+    total: int
+    size: int

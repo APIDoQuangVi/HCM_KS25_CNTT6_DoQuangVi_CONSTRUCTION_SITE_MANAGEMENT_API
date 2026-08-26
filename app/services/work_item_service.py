@@ -1,3 +1,5 @@
+from math import ceil
+
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 
@@ -164,13 +166,21 @@ def get_work_items(
     else:
         query = query.order_by(sort_column.desc())
 
-    return (
-    query
-    
-    .offset(offset)
-    .limit(limit)
-    .all()
-)
+    total = query.count()
+    items = (
+        query
+        .offset(offset)
+        .limit(limit)
+        .all()
+    )
+
+    return {
+        "items": items,
+        "totalpage": (total + limit - 1) // limit if total else 0,
+        "page": offset // limit + 1,
+        "total": total,
+        "size": limit,
+    }
 
 
 def get_work_item(
