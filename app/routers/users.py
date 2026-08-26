@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, status
 
 from sqlalchemy.orm import Session
 
@@ -22,7 +22,10 @@ router = APIRouter(
 
 @router.get(
     "/me",
-    response_model=UserResponse
+    summary="Thông tin tài khoản hiện tại",
+    description="Lấy thông tin user đang đăng nhập.",
+    response_model=UserResponse,
+    status_code=status.HTTP_200_OK,
 )
 def get_my_profile(
     current_user: User = Depends(
@@ -35,7 +38,10 @@ def get_my_profile(
 
 @router.get(
     "",
-    response_model=list[UserResponse]
+    summary="Danh sách người dùng",
+    description="Lấy danh sách người dùng. Chỉ admin mới được sử dụng.",
+    response_model=list[UserResponse],
+    status_code=status.HTTP_200_OK,
 )
 def get_all_users(
     search: str | None = None,

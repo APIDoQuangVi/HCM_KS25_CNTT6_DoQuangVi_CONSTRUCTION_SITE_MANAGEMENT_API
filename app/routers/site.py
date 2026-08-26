@@ -22,6 +22,8 @@ router = APIRouter(
 
 @router.post(
     "",
+    summary="Tạo công trình",
+    description="Tạo một công trình mới cho user hiện tại.",
     response_model=ConstructionSiteResponse,
     status_code=status.HTTP_201_CREATED,
 )
@@ -39,7 +41,10 @@ def create_construction_site(
 
 @router.get(
     "",
+    summary="Danh sách công trình của tôi",
+    description="Lấy các công trình mà user hiện tại tham gia.",
     response_model=list[ConstructionSiteResponse],
+    status_code=status.HTTP_200_OK,
 )
 def get_my_construction_sites(
     search: Optional[str] = None,
@@ -55,7 +60,10 @@ def get_my_construction_sites(
 
 @router.get(
     "/{site_id}",
+    summary="Xem chi tiết công trình",
+    description="Lấy thông tin công trình theo ID.",
     response_model=ConstructionSiteResponse,
+    status_code=status.HTTP_200_OK,
 )
 def get_construction_site(
     site_id: int,
@@ -78,7 +86,10 @@ def get_construction_site(
 
 @router.patch(
     "/{site_id}",
+    summary="Cập nhật công trình",
+    description="Cập nhật thông tin công trình theo ID.",
     response_model=ConstructionSiteResponse,
+    status_code=status.HTTP_200_OK,
 )
 def update_construction_site(
     site_id: int,
@@ -96,6 +107,8 @@ def update_construction_site(
 
 @router.delete(
     "/{site_id}",
+    summary="Xóa công trình",
+    description="Xóa công trình theo ID.",
     status_code=status.HTTP_204_NO_CONTENT,
 )
 def delete_construction_site(

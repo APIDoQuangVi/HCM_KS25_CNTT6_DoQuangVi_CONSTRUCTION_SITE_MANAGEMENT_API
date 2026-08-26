@@ -25,6 +25,8 @@ router = APIRouter(
 
 @router.post(
     "/construction-sites/{site_id}/work-items",
+    summary="Tạo hạng mục thi công",
+    description="Tạo hạng mục mới. Nếu không truyền assignee_id, hạng mục được giao cho user hiện tại.",
     response_model=WorkItemResponse,
     status_code=status.HTTP_201_CREATED,
 )
@@ -44,7 +46,10 @@ def create_work_item(
 
 @router.get(
     "/construction-sites/{site_id}/work-items",
+    summary="Danh sách hạng mục thi công",
+    description="Lấy danh sách hạng mục với bộ lọc, phân trang và sắp xếp.",
     response_model=list[WorkItemResponse],
+    status_code=status.HTTP_200_OK,
 )
 def get_work_items(
     site_id: int,
@@ -89,7 +94,10 @@ def get_work_items(
 
 @router.get(
     "/work-items/{item_id}",
+    summary="Xem hạng mục thi công",
+    description="Lấy thông tin chi tiết của một hạng mục thi công.",
     response_model=WorkItemResponse,
+    status_code=status.HTTP_200_OK,
 )
 def get_work_item(
     item_id: int,
@@ -105,7 +113,10 @@ def get_work_item(
 
 @router.patch(
     "/work-items/{item_id}",
+    summary="Cập nhật hạng mục thi công",
+    description="Cập nhật một phần thông tin của hạng mục thi công.",
     response_model=WorkItemResponse,
+    status_code=status.HTTP_200_OK,
 )
 def update_work_item(
     item_id: int,
@@ -123,6 +134,8 @@ def update_work_item(
 
 @router.delete(
     "/work-items/{item_id}",
+    summary="Xóa hạng mục thi công",
+    description="Xóa một hạng mục thi công theo ID.",
     status_code=status.HTTP_204_NO_CONTENT,
 )
 def delete_work_item(

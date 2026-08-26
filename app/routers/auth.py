@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 
 from sqlalchemy.orm import Session
 
@@ -29,8 +29,10 @@ router = APIRouter(
 
 @router.post(
     "/register",
+    summary="Đăng ký tài khoản",
+    description="Tạo tài khoản người dùng mới.",
     response_model=UserResponse,
-    status_code=201
+    status_code=status.HTTP_201_CREATED,
 )
 def register(
     data: RegisterRequest,
@@ -75,7 +77,10 @@ def register(
 
 @router.post(
     "/login",
-    response_model=TokenResponse
+    summary="Đăng nhập",
+    description="Xác thực tài khoản và cấp JWT access token.",
+    response_model=TokenResponse,
+    status_code=status.HTTP_200_OK,
 )
 def login(
     data: LoginRequest,

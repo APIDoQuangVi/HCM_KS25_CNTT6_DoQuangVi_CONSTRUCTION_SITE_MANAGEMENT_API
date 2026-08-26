@@ -19,6 +19,8 @@ router = APIRouter(
 
 @router.post(
     "",
+    summary="Thêm thành viên công trình",
+    description="Thêm user vào công trình với vai trò được chỉ định.",
     response_model=SiteMemberResponse,
     status_code=status.HTTP_201_CREATED,
 )
@@ -38,7 +40,10 @@ def add_site_member(
 
 @router.get(
     "",
+    summary="Danh sách thành viên công trình",
+    description="Lấy danh sách thành viên của công trình.",
     response_model=list[SiteMemberResponse],
+    status_code=status.HTTP_200_OK,
 )
 def get_site_members(
     site_id: int,
@@ -54,6 +59,8 @@ def get_site_members(
 
 @router.delete(
     "/{user_id}",
+    summary="Xóa thành viên công trình",
+    description="Xóa user khỏi công trình theo user ID.",
     status_code=status.HTTP_204_NO_CONTENT,
 )
 def delete_site_member(
